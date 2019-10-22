@@ -223,7 +223,7 @@ app.get('/players', function (req, res) {
   let players = [];
   let mPlayersTemp = madrid.players.map((obj) => {
     var mapped = {};
-    mapped.teamId = barcelona.id; 
+    mapped.teamId = madrid.id; 
     mapped.position = POSITIONS_STRING[obj.position];
     mapped.name = obj.name;
     mapped.img = obj.img;
