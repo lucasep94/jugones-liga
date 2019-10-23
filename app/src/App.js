@@ -1,9 +1,9 @@
 import React, { PureComponent } from 'react';
 
 import Modal from './components/modal/Modal';
+import Transfer from './components/transfer/Transfer';
 
 import './App.css';
-import reactSvg from './react.svg';
 
 const domain = 'http://localhost:3001';
 
@@ -15,12 +15,17 @@ class App extends PureComponent {
       teams: [],
       players: [],
       pichichis: [],
-      showModal: true,
-      sortDesc: true
+      showModal: false,
+      showTransfer: false,
+      sortDesc: true,
+      player_send: {}
     };
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
-    this.sortPichichis = this.sortPichichis.bind(this);
+    this.sortPichichis = this.sortPichichis.bind(this);    
+    this.openTransfer = this.openTransfer.bind(this);    
+    this.closeTransfer = this.closeTransfer.bind(this);    
+    this.doTransfer = this.doTransfer.bind(this);    
   }
 
   componentDidMount() {        
@@ -60,8 +65,7 @@ class App extends PureComponent {
 
         tempArray.forEach(p => {
           p.name = this.getPlayerName(p.playerId);
-        });
-        console.log(tempArray);
+        });        
         
         this.setState({ pichichis })
       });
@@ -104,16 +108,63 @@ class App extends PureComponent {
     return player.name;
   }
 
+  openTransfer (event) {
+    console.log(event.target.value);
+    const playerId = event.target.value;
+    if(playerId){
+      let send = this.state.players.find(x => x.id == playerId);         
+      
+      this.setState(() =>({
+        showTransfer: true,
+        player_send: send
+      }));
+    }
+  }
+
+  closeTransfer(){
+    this.setState(() =>({
+      showTransfer: false
+    }));
+  }
+
+  doTransfer(data) {
+    console.log('data:',data);
+    fetch(`${domain}/transfer`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(response => {
+        console.log('response:',response);
+        if(response.error){
+          alert(response.message);
+        }
+        else{
+          alert('success');
+          this.closeTransfer();
+        }
+      })
+      .catch(err => {
+        console.log('error POST', err);
+      });    
+  }
+
+
   render() {
     const { players } = this.state;
     const { teams } = this.state;
-    const { pichichis } = this.state;
-    
-    let showStyle =  {
+    //const { pichichis } = this.state;
+    let styleModal =  {
       display: this.state.showModal ? 'block' : 'none'
     };
 
-    const modal = <Modal getPlayer={this.getPlayerName} show={showStyle} click={this.closeModal} sort={this.sortPichichis} pichichis={this.state.pichichis} />
+    const modal = <Modal getPlayer={this.getPlayerName} show={styleModal} click={this.closeModal} sort={this.sortPichichis} pichichis={this.state.pichichis} />    
+    const transfer = this.state.showTransfer ? <Transfer doTransfer={this.doTransfer} players={this.state.players} teams={this.state.teams} click={this.closeTransfer} player_send={this.state.player_send} /> : null;
+    const openTransferHandler = this.openTransfer;
 
     return <div className="App">
       <header className="App-heading App-flex">   
@@ -128,7 +179,10 @@ class App extends PureComponent {
           ** Los comentarios de los ejercicios no los borres.
         */}       
         {
-          modal
+          modal          
+        }
+        {
+          transfer
         }
         <ul className="player-list">
           {/* 
@@ -139,8 +193,8 @@ class App extends PureComponent {
           {players.map(function (player, i) {
             const team = teams.find(x => x.id === player.teamId);
             return (
-              <li className="player-item" key={player.name}>
-                <div className="player-photo" style={{'backgroundImage': 'url('+player.img+')'}}></div>
+              <li onClick={openTransferHandler} className="player-item" key={player.id} value={player.id}>
+                <div className="player-photo" value={player.id} style={{'backgroundImage': 'url('+player.img+')'}}></div>
                 <div className="player-data">
                   <span className="row-1">{player.name} <b>{player.position}</b></span>
                   <span className="row-2">{team.name}</span>
@@ -152,10 +206,6 @@ class App extends PureComponent {
           })}
         </ul>
       </div>
-      {/* <div className="App-instructions App-flex">
-        <img className="App-logo" src={reactSvg}/>
-        <p>Edit <code>src/App.js</code> and save to hot reload your changes.</p>
-      </div> */}
     </div>
   }
 }
