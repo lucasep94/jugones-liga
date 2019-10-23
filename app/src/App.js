@@ -14,7 +14,7 @@ class App extends PureComponent {
     this.getTeams();
     this.getPlayers();
   }  
-  
+
   getTeams() {
     fetch(`${domain}/teams`)
       .then(response => {
@@ -40,7 +40,8 @@ class App extends PureComponent {
     const { teams } = this.state;
 
     return <div className="App">
-      <header className="App-heading App-flex">        
+      <header className="App-heading App-flex">   
+      <button type="button" className="header-btn">Pichichis</button>
       </header>
       <div className="App-teams App-flex">
         {/* 
@@ -49,8 +50,7 @@ class App extends PureComponent {
           Borra todo el código que no sea necesario. Solo debe existir un título: Los jugadores
           y una lista con sus nombres. 
           ** Los comentarios de los ejercicios no los borres.
-        */}
-        <h3>Los jugadores:</h3>
+        */}       
         <ul>
           {/* 
             TODO ejercicio 3
