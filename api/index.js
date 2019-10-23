@@ -311,6 +311,44 @@ app.post('/transfer', function (req, res) {
   // añade el código para cambiar de equipo al jugador
   // restar el precio de la transacción al equipo
 
+  if(player.teamId === 1){
+    var player = madrid.players.find(x => x.id == player.id);
+    var index = madrid.players.indexOf(player);
+    delete madrid.players[index];
+    
+    if(teamId === 2){
+      barcelona.money = barcelona.money - player.price;
+    }
+    else{
+      atletico.money = atletico.money - player.price;
+    }
+
+  }
+  if(player.teamId === 2){
+    var player = barcelona.players.find(x => x.id == player.id);
+    var index = barcelona.players.indexOf(player);
+    delete barcelona.players[index];
+    
+    if(teamId === 1){
+      madrid.money = madrid.money - player.price;
+    }
+    else{
+      atletico.money = atletico.money - player.price;
+    }
+  }
+  if(player.teamId === 3){
+    var player = atletico.players.find(x => x.id == player.id);
+    var index = atletico.players.indexOf(player);
+    delete atletico.players[index];
+    
+    if(teamId === 1){
+      madrid.money = madrid.money - player.price;
+    }
+    else{
+      barcelona.money = barcelona.money - player.price;
+    }
+  }
+
   res.json({})
 });
 
