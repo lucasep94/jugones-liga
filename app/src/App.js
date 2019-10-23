@@ -1,18 +1,28 @@
-import reactSvg from './react.svg'
-import './App.css'
+import React, { PureComponent } from 'react';
 
-import React, { PureComponent } from 'react'
-const domain = 'http://localhost:3001'
+import Modal from './components/modal/Modal';
+
+import './App.css';
+import reactSvg from './react.svg';
+
+const domain = 'http://localhost:3001';
 
 class App extends PureComponent {
-  state = {
-    teams: [],
-    players: []
+
+  constructor(props){
+    super(props);
+    this.state = {
+      teams: [],
+      players: [],
+      showModal: true
+    };
+    this.openModal = this.openModal.bind(this);
+    this.closeModal = this.closeModal.bind(this);
   }
 
   componentDidMount() {        
     this.getTeams();
-    this.getPlayers();
+    this.getPlayers()
   }  
 
   getTeams() {
@@ -35,13 +45,29 @@ class App extends PureComponent {
       });
   }
 
+  openModal() {    
+    this.setState(() =>({
+      showModal: true
+    }));
+  }
+  closeModal(){
+    this.setState(() =>({
+      showModal: false
+    }));
+  }
+
   render() {
     const { players } = this.state;
     const { teams } = this.state;
+    let modal;
+
+    if (this.state.showModal) {
+      modal = <Modal click={this.closeModal} />
+    }
 
     return <div className="App">
       <header className="App-heading App-flex">   
-      <button type="button" className="header-btn">Pichichis</button>
+      <button type="button" className="header-btn" onClick={this.openModal}>Pichichis</button>
       </header>
       <div className="App-teams App-flex">
         {/* 
@@ -51,6 +77,9 @@ class App extends PureComponent {
           y una lista con sus nombres. 
           ** Los comentarios de los ejercicios no los borres.
         */}       
+        {
+          modal
+        }
         <ul>
           {/* 
             TODO ejercicio 3
@@ -73,10 +102,10 @@ class App extends PureComponent {
           })}
         </ul>
       </div>
-      <div className="App-instructions App-flex">
+      {/* <div className="App-instructions App-flex">
         <img className="App-logo" src={reactSvg}/>
         <p>Edit <code>src/App.js</code> and save to hot reload your changes.</p>
-      </div>
+      </div> */}
     </div>
   }
 }
