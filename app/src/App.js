@@ -14,15 +14,19 @@ class App extends PureComponent {
     this.state = {
       teams: [],
       players: [],
-      showModal: true
+      pichichis: [],
+      showModal: true,
+      sortDesc: true
     };
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
+    this.sortPichichis = this.sortPichichis.bind(this);
   }
 
   componentDidMount() {        
     this.getTeams();
-    this.getPlayers()
+    this.getPlayers();
+    this.getPichichis();
   }  
 
   getTeams() {
@@ -45,6 +49,24 @@ class App extends PureComponent {
       });
   }
 
+  getPichichis(){
+    fetch(`${domain}/pichichis`)
+      .then(response => {
+        return response.json();
+      })
+      .then(pichichis => {
+
+        var tempArray = pichichis;
+
+        tempArray.forEach(p => {
+          p.name = this.getPlayerName(p.playerId);
+        });
+        console.log(tempArray);
+        
+        this.setState({ pichichis })
+      });
+  }
+
   openModal() {    
     this.setState(() =>({
       showModal: true
@@ -56,14 +78,42 @@ class App extends PureComponent {
     }));
   }
 
+  sortPichichis() {    
+    var tempPichichis = this.state.pichichis;
+    var sort = this.state.sortDesc;
+    tempPichichis = tempPichichis.sort(function(a, b) {
+      
+      if(sort) {
+        return parseInt(a.goals) > parseInt(b.goals) ? 1 : parseInt(a.goals) < parseInt(b.goals) ? -1 : 0;        
+      }
+      else {
+        return parseInt(a.goals) > parseInt(b.goals) ? -1 : parseInt(a.goals) < parseInt(b.goals) ? 1 : 0;
+      }
+    });   
+    this.setState(() =>({
+      pichichis: tempPichichis,
+      sortDesc: !sort
+    }));
+
+    console.log('sorted',tempPichichis);
+  }
+
+  getPlayerName(playerId){
+    var playersTemp = this.state.players;
+    var player = playersTemp.find(x=> x.id == playerId);
+    return player.name;
+  }
+
   render() {
     const { players } = this.state;
     const { teams } = this.state;
-    let modal;
+    const { pichichis } = this.state;
+    
+    let showStyle =  {
+      display: this.state.showModal ? 'block' : 'none'
+    };
 
-    if (this.state.showModal) {
-      modal = <Modal click={this.closeModal} />
-    }
+    const modal = <Modal getPlayer={this.getPlayerName} show={showStyle} click={this.closeModal} sort={this.sortPichichis} pichichis={this.state.pichichis} />
 
     return <div className="App">
       <header className="App-heading App-flex">   
@@ -80,7 +130,7 @@ class App extends PureComponent {
         {
           modal
         }
-        <ul>
+        <ul className="player-list">
           {/* 
             TODO ejercicio 3
             Vamos a pasar a darle diseño. Crea el diseño propuesto en el readme con los requerimientos que se necesite.
@@ -89,7 +139,7 @@ class App extends PureComponent {
           {players.map(function (player, i) {
             const team = teams.find(x => x.id === player.teamId);
             return (
-              <li key={player.name}>
+              <li className="player-item" key={player.name}>
                 <div className="player-photo" style={{'backgroundImage': 'url('+player.img+')'}}></div>
                 <div className="player-data">
                   <span className="row-1">{player.name} <b>{player.position}</b></span>

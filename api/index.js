@@ -227,6 +227,7 @@ app.get('/players', function (req, res) {
     mapped.position = POSITIONS_STRING[obj.position];
     mapped.name = obj.name;
     mapped.img = obj.img;
+    mapped.id = obj.id;
     return mapped;
   });
   let bPlayersTemp = barcelona.players.map((obj) => {
@@ -235,6 +236,7 @@ app.get('/players', function (req, res) {
     mapped.position = POSITIONS_STRING[obj.position];
     mapped.name = obj.name;
     mapped.img = obj.img;
+    mapped.id = obj.id;
     return mapped;
   });
   let aPlayersTemp = atletico.players.map((obj) => {    
@@ -243,6 +245,7 @@ app.get('/players', function (req, res) {
     mapped.position = POSITIONS_STRING[obj.position];
     mapped.name = obj.name;
     mapped.img = atleticoImages[obj.id];
+    mapped.id = obj.id;
     return mapped;
   });
 
