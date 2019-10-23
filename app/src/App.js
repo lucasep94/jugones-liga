@@ -11,9 +11,20 @@ class App extends PureComponent {
   }
 
   componentDidMount() {        
+    this.getTeams();
     this.getPlayers();
   }  
   
+  getTeams() {
+    fetch(`${domain}/teams`)
+      .then(response => {
+        return response.json();
+      })
+      .then(teams => {
+        this.setState({ teams })
+      });
+  }
+
   getPlayers() {
     fetch(`${domain}/players`)
       .then(response => {
@@ -26,10 +37,10 @@ class App extends PureComponent {
 
   render() {
     const { players } = this.state;
+    const { teams } = this.state;
 
     return <div className="App">
-      <header className="App-heading App-flex">
-        <h2>Bienvenido a la prueba de los equipos</h2>
+      <header className="App-heading App-flex">        
       </header>
       <div className="App-teams App-flex">
         {/* 
@@ -46,7 +57,20 @@ class App extends PureComponent {
             Vamos a pasar a darle diseño. Crea el diseño propuesto en el readme con los requerimientos que se necesite.
             Guiate por las imágenes.
            */}
-          {players.map(player => <li key={player.name}>{player.name}</li>)}
+          {players.map(function (player, i) {
+            const team = teams.find(x => x.id === player.teamId);
+            return (
+              <li key={player.name}>
+                <div className="player-photo" style={{'backgroundImage': 'url('+player.img+')'}}></div>
+                <div className="player-data">
+                  <span className="row-1">{player.name} <b>{player.position}</b></span>
+                  <span className="row-2">{team.name}</span>
+                </div>
+                <div className="player-badge" style={{'backgroundImage': 'url('+team.shield +')'}}>
+                </div>
+              </li>
+            )
+          })}
         </ul>
       </div>
       <div className="App-instructions App-flex">
